@@ -15,6 +15,27 @@
  *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define PLUGIN_VERSION "1.7.0.1"
+#define PLUGIN_DESCRIPTION "Respawn coop bot"
+#define UPDATE_URL	""
+//#define UPDATE_URL	"http://ins.jballou.com/sourcemod/update-respawn.txt"
+#define PLUGIN_NAME "[INS] Bot Respawn - publicENEMY"
+#define PLUGIN_AUTHOR "publicENEMY. Original author - Jared Ballou. Contributor - Daimyo, naong"
+#define PLUGIN_URL "https://github.com/syaifulnizamyahya/Insurgency-dy-sourcemod"
+
+ // The objective of this plugin is to respawn bot. All other function not related to bot spawning will be removed.
+ // "Do one thing only and do it well"
+ // Based on Player Respawn Plugin by Daimyo and naong which based on Player Respawn Plugin by Jared Ballou
+ 
+ /*
+ TODO
+ 1. Remove function
+ 2. Client side debugging message verbose
+ 3. Remove revive 
+ 4. Remove rank system
+ 5. Remove music playback
+ */
+ 
 //#pragma dynamic 32768	// Increase heap size
 #pragma semicolon 1
 #include <sourcemod>
@@ -30,6 +51,7 @@
 #include <navmesh>
 //#include <insurgency>
 
+// TODO:Remove
 // Define grenade index value
 #define Gren_M67 68
 #define Gren_Incen 73
@@ -53,6 +75,7 @@
 #define MAX_HIDING_SPOTS 4096
 #define MIN_PLAYER_DISTANCE 128.0
 
+// TODO:Remove
 // Counter-Attack Music
 #define COUNTER_ATTACK_MUSIC_DURATION 68.0
 
@@ -76,6 +99,7 @@ new
 	Float:g_fRagdollPosition[MAXPLAYERS+1][3],
 	Float:g_fRespawnPosition[3];
 
+// TODO:Remove	
 //Ammo Amounts
 new
 	playerClip[MAXPLAYERS + 1][2], // Track primary and secondary ammo
@@ -166,6 +190,7 @@ new
 	Handle:sm_respawn_lives_team_ins_player_count_17 = INVALID_HANDLE,
 	Handle:sm_respawn_lives_team_ins_player_count_18 = INVALID_HANDLE,
 	
+// TODO:Remove	
 	// Fatal dead
 	Handle:sm_respawn_fatal_chance = INVALID_HANDLE,
 	Handle:sm_respawn_fatal_head_chance = INVALID_HANDLE,
@@ -186,6 +211,7 @@ new
 	
 	// Misc
 	Handle:sm_respawn_reset_type = INVALID_HANDLE;
+// TODO:Remove	
 	Handle:sm_respawn_enable_track_ammo = INVALID_HANDLE,
 	
 	// Reinforcements
@@ -203,6 +229,7 @@ new
 	// Related to 'RoundEnd_Protector' plugin
 	Handle:sm_remaininglife = INVALID_HANDLE,
 
+// TODO:Remove	
 	// Medic specific
 	Handle:sm_revive_seconds = INVALID_HANDLE,
 	Handle:sm_revive_bonus = INVALID_HANDLE,
@@ -228,6 +255,7 @@ new
 	g_iCvar_final_counterattack_type,
 	g_iCvar_SpawnMode,
 	
+// TODO:Remove	
 	// Fatal dead
 	Float:g_fCvar_fatal_chance,
 	Float:g_fCvar_fatal_head_chance,
@@ -263,6 +291,7 @@ enum SpawnModes
 	SpawnMode_SpawnPoints,
 };
 
+// TODO:Remove	
 /////////////////////////////////////
 // Rank System (Based on graczu's Simple CS:S Rank - https://forums.alliedmods.net/showthread.php?p=523601)
 //
@@ -302,16 +331,18 @@ database.cfg
 #define YELLOW 0x01
 #define GREEN 0x04
 
+//TODO:If debug mode, verbose message to client
 // DEBUG MODE (1 = ON, 0 = OFF)
 new DEBUG = 0;
 
 // SOME DEFINES
 #define MAX_LINE_WIDTH 60
-#define PLUGIN_VERSION "1.4"
+//#define PLUGIN_VERSION "1.4"
 
 // STATS TIME (SET DAYS AFTER STATS ARE DELETE OF NONACTIVE PLAYERS)
 #define PLAYER_STATSOLD 30
 
+//TODO:Remove
 // STATS DEFINATION FOR PLAYERS
 new g_iStatScore[MAXPLAYERS+1];
 new g_iStatKills[MAXPLAYERS+1];
@@ -326,23 +357,20 @@ new g_iUserPtime[MAXPLAYERS+1];
 new String:g_sSteamIdSave[MAXPLAYERS+1][255];
 new g_iRank[MAXPLAYERS+1];
 
+//TODO:Remove
 // HANDLE OF DATABASE
 new Handle:g_hDB;
 //
 /////////////////////////////////////
 
-#define PLUGIN_VERSION "1.7.0"
-#define PLUGIN_DESCRIPTION "Respawn dead players via admincommand or by queues"
-#define UPDATE_URL	"http://ins.jballou.com/sourcemod/update-respawn.txt"
-
 // Plugin info
 public Plugin:myinfo =
 {
-	name = "[INS] Player Respawn",
-	author = "Jared Ballou (Contributor: Daimyo, naong)",
+	name = PLUGIN_NAME,
+	author = PLUGIN_AUTHOR,
 	version = PLUGIN_VERSION,
 	description = PLUGIN_DESCRIPTION,
-	url = "http://jballou.com"
+	url = PLUGIN_URL
 };
 
 // Start plugin
@@ -448,6 +476,7 @@ public OnPluginStart()
 	sm_respawn_lives_team_ins_player_count_18 = CreateConVar("sm_respawn_lives_team_ins_player_count_18", 
 		"90", "Total bot count (when player count is 18)(sm_respawn_type_team_ins must be 2)");
 	
+//TODO:Remove
 	// Fatally death
 	sm_respawn_fatal_chance = CreateConVar("sm_respawn_fatal_chance", "0.6", "Chance for a kill to be fatal, 0.6 default = 60% chance to be fatal (To disable set 0.0)");
 	sm_respawn_fatal_head_chance = CreateConVar("sm_respawn_fatal_head_chance", "0.7", "Chance for a headshot kill to be fatal, 0.6 default = 60% chance to be fatal");
@@ -468,6 +497,7 @@ public OnPluginStart()
 	
 	// Misc
 	sm_respawn_reset_type = CreateConVar("sm_respawn_reset_type", "0", "Set type of resetting player respawn counts: each round or each objective (0: each round, 1: each objective)");
+//TODO:Remove
 	sm_respawn_enable_track_ammo = CreateConVar("sm_respawn_enable_track_ammo", "1", "0/1 Track ammo on death to revive (may be buggy if using a different theatre that modifies ammo)");
 	
 	// Reinforcements
@@ -485,6 +515,7 @@ public OnPluginStart()
 	// Related to 'RoundEnd_Protector' plugin
 	sm_remaininglife = CreateConVar("sm_remaininglife", "-1", "Returns total remaining life.");
 	
+//TODO:Remove
 	// Medic Revive
 	sm_revive_seconds = CreateConVar("sm_revive_seconds", "5", "Time in seconds medic needs to stand over body to revive");
 	sm_revive_bonus = CreateConVar("sm_revive_bonus", "1", "Bonus revive score(kill count) for medic");
@@ -499,8 +530,10 @@ public OnPluginStart()
 	RegAdminCmd("sm_respawn_reload", Command_Reload, ADMFLAG_SLAY, "sm_respawn_reload");
 	
 	// Event hooking
+//TODO:Remove
 	HookEvent("player_hurt", Event_PlayerHurt);
 	HookEvent("player_death", Event_PlayerDeath);
+
 	HookEvent("round_start", Event_RoundStart);
 	HookEvent("round_end", Event_RoundEnd);
 	HookEvent("round_end", Event_RoundEnd_Pre, EventHookMode_Pre);
@@ -520,6 +553,7 @@ public OnPluginStart()
 	HookConVarChange(cvarMaxPlayerDistance,CvarChange);
 	// NavMesh Botspawn Specific End
 	
+//TODO:Remove
 	// Revive specific
 	HookConVarChange(sm_revive_seconds, CvarChange);
 	HookConVarChange(sm_heal_amount, CvarChange);
@@ -563,6 +597,7 @@ public OnPluginStart()
 	g_iLogicEntity = -1;
 	g_iObjResEntity = -1;
 	
+//TODO:Remove
 	/////////////////////////
 	// Rank System
 	RegConsoleCmd("say", Command_Say);			// Monitor say 
@@ -615,6 +650,7 @@ void UpdateRespawnCvars()
 	// Bot spawn mode
 	g_iCvar_SpawnMode = GetConVarInt(cvarSpawnMode);
 	
+//TODO:Remove
 	// Tracking ammo
 	g_iCvar_enable_track_ammo = GetConVarInt(sm_respawn_enable_track_ammo);
 	
@@ -628,9 +664,11 @@ void UpdateRespawnCvars()
 	//Revive counts
 	g_iReviveSeconds = GetConVarInt(sm_revive_seconds);
 	
+//TODO:Remove
 	// Heal Amount
 	g_iHeal_amount = GetConVarInt(sm_heal_amount);
 	
+//TODO:Remove
 	// Fatal dead
 	g_fCvar_fatal_chance = GetConVarFloat(sm_respawn_fatal_chance);
 	g_fCvar_fatal_head_chance = GetConVarFloat(sm_respawn_fatal_head_chance);
@@ -763,13 +801,15 @@ public Action:Timer_MapStart(Handle:Timer)
 	// Reset hiding spot
 	new iEmptyArray[MAX_OBJECTIVES];
 	g_iCPHidingSpotCount = iEmptyArray;
-	
+
+//TODO:Handle each coop mode exclusively	
 	// Check gamemode
 	decl String:sGameMode[32];
 	GetConVarString(FindConVar("mp_gamemode"), sGameMode, sizeof(sGameMode));
 	if (StrEqual(sGameMode,"conquer")) // if Hunt?
 	{
 		g_isConquer = 1;
+//TODO:Remove
 	   	SetConVarFloat(sm_respawn_fatal_chance, 0.3, true, false);
 	   	SetConVarFloat(sm_respawn_fatal_head_chance, 0.4, true, false);
 	}
@@ -782,6 +822,7 @@ public Action:Timer_MapStart(Handle:Timer)
 	new reinforce_time = GetConVarInt(sm_respawn_reinforce_time);
 	g_iReinforceTime = reinforce_time;
 	
+//TODO:Remove
 	g_iEnableRevive = 0;
 	// BotSpawn Nav Mesh initialize #################### END
 	
@@ -789,6 +830,7 @@ public Action:Timer_MapStart(Handle:Timer)
 	ResetSecurityLives();
 	ResetInsurgencyLives();
 	
+//TODO:Remove
 	// Ammo tracking timer
 	if (GetConVarInt(sm_respawn_enable_track_ammo) == 1)
 		CreateTimer(1.0, Timer_GearMonitor,_ , TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
@@ -804,12 +846,15 @@ public Action:Timer_MapStart(Handle:Timer)
 	// Player status check timer
 	CreateTimer(1.0, Timer_PlayerStatus,_ , TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
 	
+//TODO:Remove
 	// Revive monitor
 	CreateTimer(1.0, Timer_ReviveMonitor, _, TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
 	
+//TODO:Remove
 	// Heal monitor
 	CreateTimer(0.5, Timer_MedicMonitor, _, TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
 
+//TODO:Remove
 	// Display nearest body for medics
 	CreateTimer(0.2, Timer_NearestBody, _, TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
 	
@@ -895,6 +940,7 @@ public OnMapEnd()
 // Console command for reload config
 public Action:Command_Reload(client, args)
 {
+//TODO:Use different file
 	ServerCommand("exec sourcemod/respawn.cfg");
 	
 	// Reset respawn token
@@ -1028,6 +1074,7 @@ public OnGameFrame()
 */
 
 // Check and inform player status
+//TODO:Remove			
 public Action:Timer_PlayerStatus(Handle:Timer)
 {
 	for (new client = 1; client <= MaxClients; client++)
@@ -1042,7 +1089,7 @@ public Action:Timer_PlayerStatus(Handle:Timer)
 				{
 					PrintCenterText(client, "You changed your role in the squad. You can no longer be revived and must wait til next respawn!");
 				}
-				
+
 				if (!g_iCvar_respawn_enable || g_iRespawnCount[2] == -1 || g_iSpawnTokens[client] <= 0)
 				{
 					// Player was killed fatally
@@ -1088,6 +1135,7 @@ public Action:Timer_Enemies_Remaining(Handle:Timer)
 	decl String:textToPrint[64];
 	Format(textToPrintChat, sizeof(textToPrintChat), "Enemies alive: %d | Enemy reinforcements remaining: %d", alive_insurgents, g_iRemaining_lives_team_ins);
 	Format(textToPrint, sizeof(textToPrint), "Enemies alive: %d | Enemy reinforcements remaining: %d", alive_insurgents ,g_iRemaining_lives_team_ins);
+//TODO:Print to client
 	PrintHintTextToAll(textToPrint);
 	PrintToChatAll(textToPrintChat);
 	
@@ -1117,6 +1165,7 @@ public Action:Timer_EnemyReinforce(Handle:Timer)
 			decl String:textToPrint[64];
 			Format(textToPrintChat, sizeof(textToPrintChat), "Friendlies spawn on Counter-Attacks, Capture the Point!");
 			Format(textToPrint, sizeof(textToPrint), "Enemies reinforce in %d seconds | Capture the point soon!", g_iReinforceTime);
+//TODO:Print to client
 			PrintHintTextToAll(textToPrint);
 			//PrintToChatAll(textToPrintChat);
 		}
@@ -1127,6 +1176,7 @@ public Action:Timer_EnemyReinforce(Handle:Timer)
 			decl String:textToPrint[64];
 			Format(textToPrintChat, sizeof(textToPrintChat), "Friendlies spawn on Counter-Attacks, Capture the Point!");
 			Format(textToPrint, sizeof(textToPrint), "Enemies reinforce in %d seconds | Capture the point soon!", g_iReinforceTime);
+//TODO:Print to client
 			PrintHintTextToAll(textToPrint);
 			//PrintToChatAll(textToPrintChat);
 		}
@@ -1143,6 +1193,7 @@ public Action:Timer_EnemyReinforce(Handle:Timer)
 				g_iRemaining_lives_team_ins = g_iRemaining_lives_team_ins + iBotCount;
 				decl String:textToPrint[64];
 				Format(textToPrint, sizeof(textToPrint), "Enemy Reinforcements Added to Existing Reinforcements!");
+//TODO:Print to client
 				PrintHintTextToAll(textToPrint);
 				g_iReinforceTime = reinforce_time_subsequent;
 			}
@@ -1163,6 +1214,7 @@ public Action:Timer_EnemyReinforce(Handle:Timer)
 				}
 				decl String:textToPrint[64];
 				Format(textToPrint, sizeof(textToPrint), "Enemy Reinforcements Have Arrived!");
+//TODO:Print to client				
 				PrintHintTextToAll(textToPrint);
 			}
 		}
@@ -1272,6 +1324,7 @@ void AddLifeForStaticKilling(client)
 	}
 }
 
+//TODO:Remove
 // Monitor player's gear
 public Action:Timer_GearMonitor(Handle:Timer)
 {
@@ -1287,6 +1340,7 @@ public Action:Timer_GearMonitor(Handle:Timer)
 	}
 }
 
+//TODO:Remove
 // Update player's gear
 void SetPlayerAmmo(client)
 {
@@ -1377,6 +1431,8 @@ void SetPlayerAmmo(client)
 			playerRevived[client] = false;
 	}
 }
+
+//TODO:Remove
 // Retrive player's gear
 void GetPlayerAmmo(client)
 {
@@ -1595,6 +1651,7 @@ public OnClientPutInServer(client)
 {
 	playerFirstJoin[client] = true;
 	playerFirstDeath[client] = false;
+	//TODO:Remove
 	playerPickSquad[client] = 0;
 	g_iHurtFatal[client] = -1;
 	
@@ -1610,6 +1667,7 @@ public Action:Event_PlayerConnect(Handle:event, const String:name[], bool:dontBr
 	playerFirstJoin[client] = true;
 	playerFirstDeath[client] = false;
 	playerPickSquad[client] = 0;
+	//TODO:Remove
 	g_iHurtFatal[client] = -1;
 }
 
@@ -1622,6 +1680,7 @@ public Action:Event_PlayerDisconnect(Handle:event, const String:name[], bool:don
 		// Reset player status
 		playerFirstJoin[client] = true;	
 		
+//TODO:Remove
 		// Remove network ragdoll associated with player
 		new playerRag = EntRefToEntIndex(g_iClientRagdolls[client]);
 		if (playerRag > 0 && IsValidEdict(playerRag) && IsValidEntity(playerRag))
@@ -1643,11 +1702,13 @@ public Action:Event_PlayerSpawn( Handle:event, const String:name[], bool:dontBro
 		g_iPlayerRespawnTimerActive[client] = 0;
 		playerFirstJoin[client] = false;
 		
+//TODO:Remove
 		//remove network ragdoll associated with player
 		new playerRag = EntRefToEntIndex(g_iClientRagdolls[client]);
 		if(playerRag > 0 && IsValidEdict(playerRag) && IsValidEntity(playerRag))
 			RemoveRagdoll(client);
 		
+//TODO:Remove
 		g_iHurtFatal[client] = 0;
 	}
 	return Plugin_Continue;
@@ -1677,6 +1738,7 @@ public Action:Event_RoundStart(Handle:event, const String:name[], bool:dontBroad
 	// Check gamemode
 	decl String:sGameMode[32];
 	GetConVarString(FindConVar("mp_gamemode"), sGameMode, sizeof(sGameMode));
+//TODO:Handle each game mode exclusively
 	if (!StrEqual(sGameMode,"checkpoint")) // if Hunt?
 	{
 		////PrintToServer("*******NOT CHECKPOINT | SETTING sm_respawn_lives_team_ins TO 3*******");
@@ -1691,6 +1753,7 @@ public Action:Event_RoundStart(Handle:event, const String:name[], bool:dontBroad
 	}
 	////PrintToServer("[REVIVE_DEBUG] ROUND STARTED");
 	
+	//TODO:Remove
 	// Warming up revive
 	g_iEnableRevive = 0;
 	new iPreRound = GetConVarInt(FindConVar("mp_timer_preround"));
@@ -1699,6 +1762,7 @@ public Action:Event_RoundStart(Handle:event, const String:name[], bool:dontBroad
 	return Plugin_Continue;
 }
 
+//TODO:Remove
 // Round starts
 public Action:PreReviveTimer(Handle:Timer)
 {
@@ -1724,6 +1788,7 @@ public Action:Event_RoundEnd_Pre(Handle:event, const String:name[], bool:dontBro
 // When round ends, intialize variables
 public Action:Event_RoundEnd(Handle:event, const String:name[], bool:dontBroadcast)
 {
+//TODO:Remove
 	// Set client command for round end music
 	int iWinner = GetEventInt(event, "winner");
 	decl String:sMusicCommand[128];
@@ -1732,6 +1797,7 @@ public Action:Event_RoundEnd(Handle:event, const String:name[], bool:dontBroadca
 	else
 		Format(sMusicCommand, sizeof(sMusicCommand), "playgamesound Music.LostGame_Insurgents");
 	
+//TODO:Remove
 	// Play round end music
 	for (int i = 1; i <= MaxClients; i++)
 	{
@@ -1751,6 +1817,7 @@ public Action:Event_RoundEnd(Handle:event, const String:name[], bool:dontBroadca
 	hCvar = FindConVar("sm_remaininglife");
 	SetConVarInt(hCvar, -1);
 	
+//TODO:Remove
 	////PrintToServer("[REVIVE_DEBUG] ROUND ENDED");	
 	// Cooldown revive
 	g_iEnableRevive = 0;
@@ -1763,6 +1830,7 @@ public Action:Event_RoundEnd(Handle:event, const String:name[], bool:dontBroadca
 	// Update entity
 	GetObjResEnt();
 	
+//TODO:Remove
 	////////////////////////
 	// Rank System
 	if (g_hDB != INVALID_HANDLE)
@@ -1837,7 +1905,8 @@ public Action:Event_ControlPointCaptured_Pre(Handle:event, const String:name[], 
 		SetConVarInt(cvar, 0, true, false);
 		cvar = FindConVar("mp_checkpoint_counterattack_always");
 		SetConVarInt(cvar, 1, true, false);
-		
+
+		//TODO:Remove
 		// Call music timer
 		CreateTimer(COUNTER_ATTACK_MUSIC_DURATION, Timer_CounterAttackSound);
 		
@@ -1858,6 +1927,7 @@ public Action:Event_ControlPointCaptured_Pre(Handle:event, const String:name[], 
 		cvar = FindConVar("mp_checkpoint_counterattack_always");
 		SetConVarInt(cvar, 1, true, false);
 		
+//TODO:Remove
 		// Call music timer
 		CreateTimer(COUNTER_ATTACK_MUSIC_DURATION, Timer_CounterAttackSound);
 		
@@ -1881,6 +1951,7 @@ public Action:Event_ControlPointCaptured_Pre(Handle:event, const String:name[], 
 	return Plugin_Continue;
 }
 
+//TODO:Remove
 // Play music during counter-attack
 public Action:Timer_CounterAttackSound(Handle:event)
 {
@@ -2032,6 +2103,7 @@ public Action:Event_ObjectDestroyed(Handle:event, const String:name[], bool:dont
 // When counter-attack end, reset reinforcement time
 public Action:Timer_CounterAttackEnd(Handle:Timer)
 {
+//TODO:Remove
 	// If round end, exit
 	if (g_iRoundStatus == 0)
 	{
@@ -2055,6 +2127,7 @@ public Action:Timer_CounterAttackEnd(Handle:Timer)
 		if (g_iCvar_respawn_reset_type)
 			ResetSecurityLives();
 		
+//TODO:Remove
 		// Stop counter-attack music
 		StopCounterAttackMusic();
 		
@@ -2072,6 +2145,7 @@ public Action:Timer_CounterAttackEnd(Handle:Timer)
 	return Plugin_Continue;
 }
 
+//TODO:Remove
 // Stop couter-attack music
 void StopCounterAttackMusic()
 {
@@ -2204,6 +2278,7 @@ public Action:Event_PlayerPickSquad( Handle:event, const String:name[], bool:don
 		// Get player nickname
 		decl String:sNewNickname[64];
 		
+//TODO:Remove
 		// Medic class
 		if (StrContains(g_client_last_classstring[client], "medic") > -1)
 		{
@@ -2239,6 +2314,7 @@ public Action:Event_PlayerPickSquad( Handle:event, const String:name[], bool:don
 	}
 }
 
+//TODO:Remove
 // Triggers when player hurt
 public Action:Event_PlayerHurt(Handle:event, const String:name[], bool:dontBroadcast)
 {
@@ -2412,6 +2488,7 @@ public Action:Event_PlayerHurt(Handle:event, const String:name[], bool:dontBroad
 // Trigged when player die
 public Action:Event_PlayerDeath(Handle:event, const String:name[], bool:dontBroadcast)
 {
+//TODO:Remove
 	////////////////////////
 	// Rank System
 	new victimId = GetEventInt(event, "userid");
@@ -2450,6 +2527,7 @@ public Action:Event_PlayerDeath(Handle:event, const String:name[], bool:dontBroa
 	// Check enables
 	if (g_iCvar_respawn_enable)
 	{
+//TODO:Remove
 		// Convert ragdoll
 		new team = GetClientTeam(client);
 		if (team == TEAM_1)
@@ -2557,6 +2635,7 @@ public Action:Event_PlayerDeath(Handle:event, const String:name[], bool:dontBroa
 	decl String:wound_hint[64];
 	decl String:fatal_hint[64];
 	
+//TODO:Remove
 	// Display death message
 	if (g_fCvar_fatal_chance > 0.0)
 	{
@@ -2589,6 +2668,7 @@ public Action:Event_PlayerDeath(Handle:event, const String:name[], bool:dontBroa
 	return Plugin_Continue;
 }
 
+//TODO:Remove
 // Convert dead body to new ragdoll
 public Action:ConvertDeleteRagdoll(Handle:Timer, any:client)
 {	
@@ -2668,6 +2748,7 @@ public Action:ConvertDeleteRagdoll(Handle:Timer, any:client)
 	}
 }
 
+//TODO:Remove
 // Remove ragdoll
 void RemoveRagdoll(client)
 {
@@ -2680,6 +2761,7 @@ void RemoveRagdoll(client)
 	}	
 }
 
+//TODO:Remove
 // This handles revives by medics
 public CreateReviveTimer(client)
 {
@@ -2715,6 +2797,7 @@ public CreatePlayerRespawnTimer(client)
 	}
 }
 
+//TODO:Remove
 // Revive player
 public Action:RespawnPlayerRevive(Handle:Timer, any:client)
 {
@@ -2743,6 +2826,7 @@ public Action:RespawnPlayerRevive(Handle:Timer, any:client)
 	
 }
 
+//TODO:Remove
 // Do post revive stuff
 public Action:RespawnPlayerRevivePost(Handle:timer, any:client)
 {
@@ -2769,9 +2853,11 @@ public Action:RespawnPlayerCounter(Handle:Timer, any:client)
 	// Call forcerespawn fucntion
 	SDKCall(g_hPlayerRespawn, client);
 
+//TODO:Remove
 	// Get player's ragdoll
 	new playerRag = EntRefToEntIndex(g_iClientRagdolls[client]);
 	
+//TODO:Remove
 	//Remove network ragdoll
 	if(playerRag > 0 && IsValidEdict(playerRag) && IsValidEntity(playerRag))
 		RemoveRagdoll(client);
@@ -2787,6 +2873,7 @@ public Action:RespawnPlayerPost(Handle:timer, any:client)
 	// Exit if client is not in game
 	if (!IsClientInGame(client)) return;
 	
+//TODO:Remove
 	// If set 'sm_respawn_enable_track_ammo', restore player's ammo
 	if (g_iCvar_enable_track_ammo == 1)
 		SetPlayerAmmo(client);
@@ -2796,6 +2883,7 @@ public Action:RespawnPlayerPost(Handle:timer, any:client)
 	if (g_fRespawnPosition[0] != 0.0 && g_fRespawnPosition[1] != 0.0 && g_fRespawnPosition[2] != 0.0)
 		TeleportEntity(client, g_fRespawnPosition, NULL_VECTOR, NULL_VECTOR);
 	
+//TODO:Remove
 	// Reset ragdoll position
 	g_fRagdollPosition[client][0] = 0.0;
 	g_fRagdollPosition[client][1] = 0.0;
@@ -2886,6 +2974,7 @@ public Action:Timer_PlayerRespawn(Handle:Timer, any:client)
 	{
 		if (g_iRespawnTimeRemaining[client] > 0)
 		{
+//TODO:Remove
 			// Print remaining time to center text area
 			if (!IsFakeClient(client))
 			{
@@ -2908,13 +2997,16 @@ public Action:Timer_PlayerRespawn(Handle:Timer, any:client)
 			// Call forcerespawn function
 			SDKCall(g_hPlayerRespawn, client);
 			
+//TODO:Remove
 			// Print remaining time to center text area
 			if (!IsFakeClient(client))
 				PrintCenterText(client, "You are respawned! (%d lives left)", g_iSpawnTokens[client]);
 			
+//TODO:Remove
 			// Get ragdoll position
 			new playerRag = EntRefToEntIndex(g_iClientRagdolls[client]);
 			
+//TODO:Remove
 			// Remove network ragdoll
 			if(playerRag > 0 && IsValidEdict(playerRag) && IsValidEntity(playerRag))
 				RemoveRagdoll(client);
@@ -2923,6 +3015,7 @@ public Action:Timer_PlayerRespawn(Handle:Timer, any:client)
 			//CreateTimer(0.0, RespawnPlayerPost, client);
 			RespawnPlayerPost(INVALID_HANDLE, client);
 			
+//TODO:Remove
 			// Announce respawn
 			PrintToChatAll("\x05%N\x01 is respawned..", client);
 			
@@ -3121,6 +3214,7 @@ public Action:Timer_RevivePeriod(Handle:Timer, Handle:revivePack)
 }
 */
 
+//TODO:Remove
 // Handles reviving for medics
 public Action:Timer_ReviveMonitor(Handle:timer, any:data)
 {
@@ -3260,6 +3354,7 @@ public Action:Timer_ReviveMonitor(Handle:timer, any:data)
 	return Plugin_Continue;
 }
 
+//TODO:Remove
 // Handles medic functions (Inspecting health, healing)
 public Action:Timer_MedicMonitor(Handle:timer)
 {
@@ -3347,6 +3442,7 @@ public Action:Timer_MedicMonitor(Handle:timer)
 	return Plugin_Continue; 
 }
 
+//TODO:Remove
 // Check for nearest player
 public Action:Timer_NearestBody(Handle:timer, any:data)
 {
@@ -3448,6 +3544,7 @@ public Action:Timer_NearestBody(Handle:timer, any:data)
 	return Plugin_Continue;
 }
 
+//TODO:Remove
 /**
  * Get direction string for nearest dead body
  *
@@ -3507,6 +3604,7 @@ String:GetDirectionString(Float:fClientAngles[3], Float:fClientPosition[3], Floa
 	return sDirection;
 }
 
+//TODO:Remove
 // Return distance string
 String:GetDistanceString(Float:fDistance)
 {
@@ -3826,6 +3924,7 @@ public bool:Base_TraceFilter(entity, contentsMask, any:data)
 } 
 
 
+//TODO:Remove
 // ================================================================================
 // Start Rank System
 // ================================================================================
@@ -4065,7 +4164,7 @@ public GetMyRank(client){
 		if(g_iUserInit[client] == 1){
 			// Get stat data from DB
 			decl String:buffer[200];
-			Format(buffer, sizeof(buffer), "SELECT `score`, `kills`, `deaths`, `headshots`, `sucsides`, `revives`, `heals` FROM `ins_rank` WHERE `steamId` = '%s' LIMIT 1", g_sSteamIdSave[client]);
+			Format(buffer, sizeof(buffer), "SELECT `score`, `kills`, `deaths`, `headshots`, `suicides`, `revives`, `heals` FROM `ins_rank` WHERE `steamId` = '%s' LIMIT 1", g_sSteamIdSave[client]);
 			if(DEBUG == 1){
 				PrintToServer("DEBUG: GetMyRank (%s)", buffer);
 			}
